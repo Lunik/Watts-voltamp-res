@@ -1,0 +1,1257 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Watts & voltampères</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Share+Tech+Mono&display=swap">
+<style>
+/* Layout: long explainer — thesis hero, oscilloscope lab, unit cards, then a two-column simulator (settings rail | instruments), then a Linky memo. One colour per electrical quantity, used everywhere. */
+:root{
+  --paper:#EDF0F3; --raise:#FBFCFD; --sunk:#E5E9EE; --rule:#CFD5DD; --rule-2:#E0E5EA;
+  --ink:#111824; --ink-2:#435063; --ink-3:#727E92;
+  --p:#C4501A; --q:#07808A; --d:#8550B8; --s:#2A3DBF; --pv:#21844A; --alert:#C4142F;
+  --case:#E1E4D8; --case-edge:#C2C7B6; --lcd:#B9C6A0; --lcd-ink:#17220E; --lcd-ghost:rgba(23,34,14,.08);
+  --shadow:0 1px 2px rgb(17 24 36 / .05), 0 6px 18px rgb(17 24 36 / .05);
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --f-lcd:"Share Tech Mono","IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0D1219; --raise:#141B25; --sunk:#0A0F15; --rule:#283345; --rule-2:#1D2634;
+  --ink:#E7ECF3; --ink-2:#A7B2C3; --ink-3:#727E92;
+  --p:#F07B3F; --q:#2CC3CE; --d:#B78CE6; --s:#8B99FF; --pv:#4CC47E; --alert:#FF5B70;
+  --case:#252A23; --case-edge:#394133; --lcd:#0E1B12; --lcd-ink:#93E5A2; --lcd-ghost:rgba(147,229,162,.07);
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 6px 18px rgb(0 0 0 / .25);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0D1219; --raise:#141B25; --sunk:#0A0F15; --rule:#283345; --rule-2:#1D2634;
+  --ink:#E7ECF3; --ink-2:#A7B2C3; --ink-3:#727E92;
+  --p:#F07B3F; --q:#2CC3CE; --d:#B78CE6; --s:#8B99FF; --pv:#4CC47E; --alert:#FF5B70;
+  --case:#252A23; --case-edge:#394133; --lcd:#0E1B12; --lcd-ink:#93E5A2; --lcd-ghost:rgba(147,229,162,.07);
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 6px 18px rgb(0 0 0 / .25);
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1240px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+:focus-visible{outline:2px solid var(--s);outline-offset:2px;border-radius:4px}
+button{font:inherit;color:inherit}
+.c-p{color:var(--p)}.c-q{color:var(--q)}.c-d{color:var(--d)}.c-s{color:var(--s)}.c-pv{color:var(--pv)}.c-al{color:var(--alert)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:16px;height:54px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-family:var(--f-display);font-stretch:112%;font-weight:700;font-size:15px;white-space:nowrap}
+.brand-mark{display:inline-flex;align-items:center;white-space:nowrap;place-items:center;height:26px;padding:0 7px;border:1.5px solid var(--ink);border-radius:5px;font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.02em}
+.brand-mark i{font-style:normal;color:var(--p)}.brand-mark b{color:var(--s);font-weight:600}
+.top nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.top nav a{font-size:13px;font-weight:500;color:var(--ink-2);text-decoration:none;padding:6px 10px;border-radius:6px;white-space:nowrap}
+.top nav a:hover{background:var(--sunk);color:var(--ink)}
+@media (max-width:560px){.brand-name{display:none}.top nav a{padding:6px 8px}}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:48px;align-items:end;padding-block:64px 52px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin:0}
+h1{font-family:var(--f-display);font-stretch:118%;font-weight:800;font-size:clamp(2.15rem,5.1vw,4.3rem);line-height:1.01;letter-spacing:-.018em;text-wrap:balance;margin:.35em 0 .45em}
+h1 .w{color:var(--p)} h1 .va{color:var(--s)}
+.lede{font-size:1.08rem;line-height:1.6;color:var(--ink-2);max-width:60ch;margin:0}
+.formula{border-top:2px solid var(--ink);padding-top:18px}
+.f-eq{font-family:var(--f-mono);font-size:clamp(1.5rem,2.6vw,2.05rem);font-weight:500;letter-spacing:-.01em;margin-bottom:14px;white-space:nowrap}
+.f-eq sup{font-size:.55em}
+.f-key{display:grid;grid-template-columns:auto auto 1fr;gap:6px 14px;margin:0;font-size:14px;align-items:baseline}
+.f-key dt{font-family:var(--f-mono);font-weight:600}
+.f-key .u{font-family:var(--f-mono);color:var(--ink-3);font-size:12.5px}
+.f-key dd{margin:0;color:var(--ink-2)}
+.f-lam{margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);font-size:14px;color:var(--ink-2)}
+.f-lam b{font-family:var(--f-mono);color:var(--ink);font-weight:600}
+@media (max-width:860px){.hero{grid-template-columns:1fr;gap:32px;padding-block:44px 36px}}
+
+/* sections */
+.sec{border-top:1px solid var(--rule);padding-block:56px}
+.sec-head{display:grid;gap:10px;margin-bottom:28px;max-width:72ch}
+h2{font-family:var(--f-display);font-stretch:112%;font-weight:750;font-size:clamp(1.6rem,3.1vw,2.45rem);line-height:1.08;letter-spacing:-.012em;text-wrap:balance;margin:0}
+.sec-lede{margin:0;color:var(--ink-2);font-size:1.02rem}
+h3{font-family:var(--f-display);font-stretch:108%;font-weight:700;font-size:1.05rem;margin:0;letter-spacing:-.005em}
+.card{background:var(--raise);border:1px solid var(--rule);border-radius:12px;box-shadow:var(--shadow)}
+
+/* controls */
+.seg{display:flex;flex-wrap:wrap;gap:3px;padding:3px;background:var(--sunk);border:1px solid var(--rule);border-radius:9px}
+.seg button{flex:1 1 auto;border:0;background:transparent;font-size:13px;font-weight:500;color:var(--ink-2);padding:6px 9px;border-radius:6px;cursor:pointer;white-space:nowrap;min-height:32px}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--raise);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0 / .1),0 0 0 1px var(--rule)}
+.field{display:grid;gap:7px}
+.frow{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.flabel{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.fval{font-family:var(--f-mono);font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--ink-3)}
+input[type=range]{width:100%;margin:0;accent-color:var(--ink);height:26px;cursor:pointer}
+.sw{appearance:none;-webkit-appearance:none;width:36px;height:21px;border-radius:21px;background:var(--rule);position:relative;cursor:pointer;flex:none;margin:0;transition:background .15s}
+.sw::after{content:"";position:absolute;top:2.5px;left:2.5px;width:16px;height:16px;border-radius:50%;background:var(--raise);box-shadow:0 1px 2px rgb(0 0 0 / .3);transition:transform .15s}
+.sw:checked{background:var(--ink)}.sw:checked::after{transform:translateX(15px)}
+.swrow{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);font-size:13px;font-weight:600;padding:7px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+.btn.ghost:hover{border-color:var(--ink-3)}
+.btn[disabled]{opacity:.4;cursor:default}
+.btn svg{width:13px;height:13px;fill:currentColor}
+
+/* lab */
+.lab{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+.scope{padding:14px 14px 16px;display:grid;gap:12px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw-l{width:16px;height:3px;border-radius:2px;display:inline-block}
+.sw-a{width:12px;height:10px;border-radius:2px;display:inline-block}
+.sw-dash{width:16px;height:0;border-top:2px dashed;display:inline-block}
+svg text{font-family:var(--f-mono);font-size:10.5px;fill:var(--ink-3)}
+#scope,#chart{display:block;width:100%;touch-action:pan-y}
+.scr{fill:var(--sunk)}.gl{stroke:var(--rule);stroke-width:1}.gl0{stroke:var(--ink-3);stroke-width:1;opacity:.6}
+.tr-u{stroke:var(--ink-2);stroke-width:1.6;fill:none}.tr-i{stroke:var(--s);stroke-width:2.2;fill:none}
+.ar-pos{fill:var(--p);fill-opacity:.3}.ar-neg{fill:var(--q);fill-opacity:.45}.tr-p{stroke:var(--p);stroke-width:1.3;fill:none}
+.pm{stroke:var(--p);stroke-width:1.6;stroke-dasharray:6 4}
+text.t-p{fill:var(--p)}text.t-s{fill:var(--s)}text.t-q{fill:var(--q)}text.t-d{fill:var(--d)}text.t-al{fill:var(--alert)}text.t-pv{fill:var(--pv)}text.t-ink{fill:var(--ink-2)}
+.pbars{display:grid;gap:8px}
+.pbar{display:grid;grid-template-columns:92px minmax(0,1fr) 92px;align-items:center;gap:10px;font-size:13px}
+.pb-lbl{color:var(--ink-2)}
+.pb-track{height:12px;background:var(--sunk);border-radius:3px;overflow:hidden}
+.pb-fill{height:100%;border-radius:3px;transition:width .25s}
+.pb-val{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.lab-say{margin:0;font-size:14.5px;color:var(--ink-2);border-top:1px solid var(--rule-2);padding-top:12px}
+.lab-say b{color:var(--ink);font-weight:600}
+.lab-side{display:grid;gap:20px}
+.ctl-card{padding:16px;display:grid;gap:16px}
+.ro-card{padding:16px;display:grid;gap:10px}
+.ro-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 10px}
+.ro .lbl{display:block;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:2px}
+.ro .num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:19px;font-weight:500;white-space:nowrap}
+.ro .num small{font-size:12px;color:var(--ink-3);margin-left:3px;font-weight:400}
+.tri{display:block;width:100%}
+.tri .v{stroke-width:3;stroke-linecap:round;fill:none}
+.v-p{stroke:var(--p)}.v-q{stroke:var(--q)}.v-d{stroke:var(--d);stroke-dasharray:5 4}.v-s{stroke:var(--s)}
+.tri .ra{stroke:var(--ink-3);fill:none;stroke-width:1}
+.tri text{font-size:11.5px}
+.t-mute{fill:var(--ink-3)}
+@media (max-width:980px){.lab{grid-template-columns:1fr}}
+@media (max-width:480px){.ro-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pbar{grid-template-columns:72px minmax(0,1fr) 80px}}
+
+/* units */
+.units{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:2px solid var(--ink)}
+.unit{padding:18px 18px 20px 0;display:grid;gap:8px;align-content:start}
+.unit + .unit{padding-left:18px;border-left:1px solid var(--rule)}
+.unit .sym{font-family:var(--f-display);font-stretch:125%;font-weight:800;font-size:2.6rem;line-height:1}
+.unit .nm{font-weight:600;font-size:15px}
+.unit .un{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-3)}
+.unit p{margin:0;font-size:14px;color:var(--ink-2)}
+.unit .ex{font-family:var(--f-mono);font-size:12.5px;color:var(--ink);background:var(--sunk);border-radius:6px;padding:7px 9px;margin-top:4px}
+.unit .who{font-size:12.5px;color:var(--ink-3)}
+.lam-strip{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px 28px;align-items:baseline;padding:14px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);font-size:14px;color:var(--ink-2)}
+.lam-strip b{font-family:var(--f-mono);color:var(--ink);font-weight:600}
+@media (max-width:900px){.units{grid-template-columns:repeat(2,minmax(0,1fr))}.unit:nth-child(3){padding-left:0;border-left:0}.unit:nth-child(n+3){border-top:1px solid var(--rule)}}
+@media (max-width:520px){.units{grid-template-columns:1fr}.unit + .unit{padding-left:0;border-left:0;border-top:1px solid var(--rule)}}
+
+/* simulator */
+.presets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:22px}
+.preset{text-align:left;border:1px solid var(--rule);background:var(--raise);border-radius:10px;padding:12px 14px;cursor:pointer;display:grid;gap:3px}
+.preset:hover{border-color:var(--ink-3)}
+.preset[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.preset b{font-family:var(--f-display);font-stretch:108%;font-weight:700;font-size:14.5px}
+.preset span{font-size:12.5px;color:var(--ink-3)}
+.custom-note{font-size:12.5px;color:var(--ink-3);margin:-12px 0 18px}
+@media (max-width:900px){.presets{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.foyer{display:grid;grid-template-columns:330px minmax(0,1fr);gap:22px;align-items:start}
+.cfg{position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);max-height:calc(100vh - 90px);overflow:auto;padding:4px 16px 16px;overscroll-behavior:contain}
+.grp{display:grid;gap:12px;padding-block:16px;border-bottom:1px solid var(--rule-2)}
+.grp:last-child{border-bottom:0}
+.grp h3{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.stepper{display:flex;align-items:center;gap:0;border:1px solid var(--rule);border-radius:9px;overflow:hidden;background:var(--raise)}
+.stepper button{border:0;background:var(--sunk);width:40px;height:36px;font-size:18px;cursor:pointer}
+.stepper button:hover{color:var(--s)}
+.stepper output{flex:1;text-align:center;font-family:var(--f-mono);font-weight:600;font-size:15px}
+.strip{display:block;width:100%;height:20px}
+.st-a{fill:var(--ink-3);fill-opacity:.35}.st-a.on{fill:var(--p);fill-opacity:.55}.st-a.pv{fill:var(--pv);fill-opacity:.55}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:12px;min-width:0}
+fieldset[disabled]{opacity:.45}
+.ev-info{font-size:12.5px;color:var(--ink-2);font-family:var(--f-mono)}
+.apps{list-style:none;margin:0;padding:0;display:grid}
+.apps .gh{font-size:11.5px;color:var(--ink-3);padding:10px 0 4px}
+.app{display:grid;grid-template-columns:auto minmax(0,1fr) 74px;gap:10px;align-items:center;padding:6px 0;cursor:pointer}
+.app .an{font-size:13.5px;line-height:1.25}
+.app .am{display:block;font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.app .strip{height:18px}
+@media (max-width:1040px){.foyer{grid-template-columns:1fr}.cfg{position:static;max-height:none;overflow:visible}}
+
+.main{display:grid;gap:18px;min-width:0}
+.verdict{padding:16px 18px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;align-items:start}
+.pill{justify-self:start;font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:5px;white-space:nowrap;margin-top:3px}
+.pill.ok{color:var(--pv);background:color-mix(in srgb,var(--pv) 14%,transparent)}
+.pill.bad{color:var(--alert);background:color-mix(in srgb,var(--alert) 14%,transparent)}
+.pill.warn{color:var(--p);background:color-mix(in srgb,var(--p) 14%,transparent)}
+.v-title{font-family:var(--f-display);font-stretch:110%;font-weight:700;font-size:1.25rem;line-height:1.25;margin:0;text-wrap:balance}
+.v-body{grid-column:2;margin:0;color:var(--ink-2);font-size:14.5px}
+.v-body b{color:var(--ink);font-weight:600}
+.v-watts{grid-column:2;margin:4px 0 0;font-size:13.5px;color:var(--ink-2);padding-left:10px;border-left:2px solid var(--s)}
+.v-act{grid-column:2;display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+@media (max-width:520px){.verdict{grid-template-columns:1fr}.v-body,.v-watts,.v-act{grid-column:1}}
+
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--rule-2);border:1px solid var(--rule);border-radius:12px;overflow:hidden}
+.kpi{background:var(--raise);padding:12px 14px;display:grid;gap:1px;min-width:0}
+.kpi .k{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.kpi .n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:21px;font-weight:500;white-space:nowrap}
+.kpi .n small{font-size:12.5px;color:var(--ink-3);font-weight:400;margin-left:3px}
+.kpi .sub{font-size:12.5px;color:var(--ink-3)}
+@media (max-width:560px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi .n{font-size:18px}}
+
+.chart-card{padding:14px 14px 12px;display:grid;gap:10px}
+.chart-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;align-items:baseline}
+.chart-wrap{position:relative}
+.ar-load{fill:var(--p);fill-opacity:.2}.ar-inj{fill:var(--pv);fill-opacity:.32}
+.l-p{stroke:var(--p);stroke-width:1.2;fill:none}.l-s{stroke:var(--s);stroke-width:1.8;fill:none;stroke-linejoin:round}
+.l-pv{stroke:var(--pv);stroke-width:1.6;stroke-dasharray:5 3;fill:none}
+.l-ps{stroke:var(--alert);stroke-width:1.4;stroke-dasharray:7 4}
+.ov-band{fill:var(--alert);fill-opacity:.1}.ov-tick{fill:var(--alert)}
+.hc-band{fill:var(--ink-3);fill-opacity:.07}
+.cur-l{stroke:var(--ink);stroke-width:1}
+.cur-d{stroke:var(--raise);stroke-width:2}
+.dot-s{fill:var(--s)}.dot-p{fill:var(--p)}
+.tip{position:absolute;top:2px;transform:translateX(-50%);background:var(--ink);color:var(--paper);border-radius:6px;padding:4px 8px;font-family:var(--f-mono);font-size:11.5px;white-space:nowrap;pointer-events:none;display:flex;gap:8px;font-variant-numeric:tabular-nums}
+.tip .ts{color:color-mix(in srgb,var(--s) 45%,var(--paper))}.tip .tp{color:color-mix(in srgb,var(--p) 45%,var(--paper))}
+.tip .ta{color:color-mix(in srgb,var(--alert) 50%,var(--paper))}
+.chart-foot{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+.chart-foot input{flex:1 1 220px;min-width:0}
+.tout{font-family:var(--f-mono);font-size:15px;font-weight:600;min-width:46px;text-align:center}
+
+.inst{padding:16px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:start}
+.inst-r{display:grid;gap:12px;min-width:0}
+@media (max-width:720px){.inst{grid-template-columns:1fr}}
+.meter{width:290px;max-width:100%;background:var(--case);border:1px solid var(--case-edge);border-radius:20px 20px 14px 14px;padding:14px 14px 12px;display:grid;gap:10px;box-shadow:inset 0 1px 0 rgb(255 255 255 / .25)}
+.m-head{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:10.5px;color:var(--ink-2);letter-spacing:.04em}
+.lcd{background:var(--lcd);color:var(--lcd-ink);font-family:var(--f-lcd);border-radius:5px;padding:9px 11px 8px;box-shadow:inset 0 2px 7px rgb(0 0 0 / .22);display:grid;gap:2px}
+.lcd-1{display:flex;justify-content:space-between;font-size:15px;letter-spacing:.07em}
+.lcd-2{position:relative;text-align:right;font-size:27px;letter-spacing:.04em;line-height:1.15;white-space:nowrap;overflow:hidden}
+.lcd-2 .gh{position:absolute;right:0;top:0;color:var(--lcd-ghost)}
+.lcd-2 .vv{position:relative}
+.lcd.alarm .lcd-2 .vv{animation:blink 1s steps(2,start) infinite}
+@keyframes blink{to{visibility:hidden}}
+@media (prefers-reduced-motion: reduce){.lcd.alarm .lcd-2 .vv{animation:none}}
+.m-desc{font-size:12px;color:var(--ink-2);min-height:2.5em;line-height:1.3}
+.m-ctl{display:flex;align-items:center;gap:8px}
+.m-ctl button{width:34px;height:34px;border-radius:50%;border:1px solid var(--case-edge);background:var(--raise);font-size:17px;cursor:pointer;line-height:1}
+.m-state{flex:1;text-align:right;font-family:var(--f-mono);font-size:11px;letter-spacing:.04em}
+.m-state.bad{color:var(--alert);font-weight:600}.m-state.inj{color:var(--pv)}
+
+.bk{padding:16px;display:grid;gap:6px}
+.bk-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.bk-legend{display:flex;gap:14px;font-size:12px;color:var(--ink-3)}
+.bk-legend span{display:inline-flex;align-items:center;gap:5px}
+.bk-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;padding:7px 0;border-bottom:1px solid var(--rule-2);font-size:13.5px}
+.bk-n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bk-v{font-family:var(--f-mono);font-size:12px;color:var(--ink-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.bk-bars{grid-column:1/-1;position:relative;height:10px}
+.bk-s{position:absolute;left:0;top:0;height:10px;border:1.5px solid var(--s);border-radius:2px}
+.bk-p{position:absolute;left:0;top:2.5px;height:5px;background:var(--p);border-radius:1px}
+.bk-g{position:absolute;left:0;top:1px;height:8px;background:var(--pv);border-radius:2px;opacity:.75}
+.bk-sum{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding-top:10px;font-size:13.5px}
+.bk-sum .mono{text-align:right}
+.bk-note{margin:6px 0 0;font-size:13.5px;color:var(--ink-2)}
+
+/* memo */
+.memo{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px;align-items:start}
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl caption{text-align:left;font-family:var(--f-display);font-stretch:108%;font-weight:700;font-size:1.05rem;padding-bottom:10px}
+.tbl th{text-align:left;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:8px 10px 8px 0;border-bottom:1.5px solid var(--ink)}
+.tbl td{padding:8px 10px 8px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.tbl td.k{font-family:var(--f-mono);font-weight:600;white-space:nowrap}
+.tbl td.u{font-family:var(--f-mono);color:var(--ink-3);white-space:nowrap}
+.tbl td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.memo-r{display:grid;gap:28px}
+.keep{margin:0;padding:0;list-style:none;counter-reset:k;display:grid;gap:12px}
+.keep li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;font-size:14.5px;color:var(--ink-2)}
+.keep li::before{counter-increment:k;content:counter(k);font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--ink);border:1px solid var(--ink);border-radius:50%;width:20px;height:20px;display:grid;place-items:center;margin-top:1px}
+.keep b{color:var(--ink);font-weight:600}
+.callout{margin-top:6px;padding:14px 16px;border-radius:10px;background:var(--sunk);font-size:14px;color:var(--ink-2)}
+.callout b{color:var(--ink)}
+@media (max-width:900px){.memo{grid-template-columns:1fr}}
+footer{border-top:1px solid var(--rule);padding-block:24px 40px;font-size:13px;color:var(--ink-3)}
+footer p{margin:0;max-width:90ch}
+</style>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#top"><span class="brand-mark"><i>W</i>/<b>VA</b></span><span class="brand-name">Watts & voltampères</span></a>
+    <nav aria-label="Sections">
+      <a href="#labo">Labo</a><a href="#grandeurs">Grandeurs</a><a href="#foyer">Foyer</a><a href="#memo">Mémo Linky</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="wrap hero">
+    <div>
+      <p class="eyebrow">Électricité domestique · réseau monophasé 230 V</p>
+      <h1>Vous payez des <span class="w">watts</span>. Votre compteur coupe en <span class="va">voltampères</span>.</h1>
+      <p class="lede">La facture compte l'énergie en kilowattheures. L'abonnement plafonne une puissance en kilovoltampères. Entre les deux, il y a le courant qui circule dans vos câbles sans rien produire. Cette page le rend visible, de l'oscilloscope jusqu'à la courbe de charge d'une maison et son Linky.</p>
+    </div>
+    <aside class="formula" aria-label="Relation entre les puissances">
+      <div class="f-eq"><span class="c-s">S</span><sup>2</sup> = <span class="c-p">P</span><sup>2</sup> + <span class="c-q">Q</span><sup>2</sup> + <span class="c-d">D</span><sup>2</sup></div>
+      <dl class="f-key">
+        <dt class="c-s">S</dt><span class="u">VA</span><dd>ce que le compteur limite</dd>
+        <dt class="c-p">P</dt><span class="u">W</span><dd>ce que vous payez, en kWh</dd>
+        <dt class="c-q">Q</dt><span class="u">var</span><dd>l'aller-retour des moteurs</dd>
+        <dt class="c-d">D</dt><span class="u">VA</span><dd>les à-coups de l'électronique</dd>
+      </dl>
+      <p class="f-lam">Facteur de puissance <b>λ = P / S</b>. Il vaut 1 quand tout le courant travaille.</p>
+    </aside>
+  </section>
+
+  <!-- LAB -->
+  <section id="labo" class="sec">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Oscilloscope · 230 V · 50 Hz · deux périodes</p>
+        <h2>Même travail, plus de courant</h2>
+        <p class="sec-lede">Réglez une charge. La puissance utile reste celle que vous choisissez, mais déphaser ou déformer le courant oblige le réseau à en faire passer davantage. C'est cet excédent que mesurent les VA.</p>
+      </div>
+      <div class="lab">
+        <div class="card scope">
+          <div class="legend">
+            <span><i class="sw-l" style="background:var(--ink-2)"></i>u(t) tension</span>
+            <span><i class="sw-l" style="background:var(--s)"></i>i(t) courant</span>
+            <span><i class="sw-a" style="background:var(--p);opacity:.55"></i>p(t) &gt; 0 consommée</span>
+            <span><i class="sw-a" style="background:var(--q);opacity:.65"></i>p(t) &lt; 0 renvoyée au réseau</span>
+          </div>
+          <svg id="scope" role="img" aria-label="Tension, courant et puissance instantanée sur deux périodes"></svg>
+          <div class="pbars" aria-live="polite">
+            <div class="pbar"><span class="pb-lbl">Utile</span><div class="pb-track"><div class="pb-fill" id="barP" style="background:var(--p)"></div></div><span class="pb-val c-p" id="barPv"></span></div>
+            <div class="pbar"><span class="pb-lbl">Transporté</span><div class="pb-track"><div class="pb-fill" id="barS" style="background:var(--s)"></div></div><span class="pb-val c-s" id="barSv"></span></div>
+          </div>
+          <p class="lab-say" id="labSay"></p>
+        </div>
+        <div class="lab-side">
+          <div class="card ctl-card">
+            <div class="field">
+              <span class="flabel">Type de charge</span>
+              <div class="seg" id="labPresets">
+                <button type="button" data-lp="radiateur">Radiateur</button>
+                <button type="button" data-lp="moteur">Moteur</button>
+                <button type="button" data-lp="chargeur">Chargeur</button>
+                <button type="button" data-lp="capa">Capacitif</button>
+              </div>
+            </div>
+            <div class="field">
+              <div class="frow"><label class="flabel" for="lP">Puissance utile P</label><output class="fval" id="lPo"></output></div>
+              <input type="range" id="lP" min="100" max="3000" step="50">
+            </div>
+            <div class="field">
+              <div class="frow"><label class="flabel" for="lPhi">Déphasage φ</label><output class="fval" id="lPhio"></output></div>
+              <input type="range" id="lPhi" min="-75" max="75" step="1">
+              <span class="hint" id="lPhiH"></span>
+            </div>
+            <div class="field">
+              <div class="frow"><label class="flabel" for="lH">Distorsion du courant</label><output class="fval" id="lHo"></output></div>
+              <input type="range" id="lH" min="0" max="150" step="5">
+              <span class="hint">Harmoniques ramenées au rang 3, comme le courant en pointe d'un redresseur.</span>
+            </div>
+          </div>
+          <div class="card ro-card">
+            <div class="ro-grid">
+              <div class="ro"><span class="lbl">Active P</span><div class="num c-p"><span id="rP"></span><small>W</small></div></div>
+              <div class="ro"><span class="lbl">Réactive Q</span><div class="num c-q"><span id="rQ"></span><small>var</small></div></div>
+              <div class="ro"><span class="lbl">Déformante D</span><div class="num c-d"><span id="rD"></span><small>VA</small></div></div>
+              <div class="ro"><span class="lbl">Apparente S</span><div class="num c-s"><span id="rS"></span><small>VA</small></div></div>
+              <div class="ro"><span class="lbl">Courant I</span><div class="num"><span id="rI"></span><small>A</small></div></div>
+              <div class="ro"><span class="lbl">Facteur λ</span><div class="num"><span id="rL"></span></div></div>
+            </div>
+            <svg class="tri" id="labTri" data-h="210" role="img" aria-label="Diagramme des puissances"></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UNITS -->
+  <section id="grandeurs" class="sec">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Unités et ordres de grandeur</p>
+        <h2>Quatre grandeurs, deux factures possibles</h2>
+        <p class="sec-lede">Le fournisseur facture une seule d'entre elles. Le réseau, les câbles et le compteur subissent toutes les autres.</p>
+      </div>
+      <div class="units">
+        <div class="unit">
+          <span class="sym c-p">P</span>
+          <span class="nm">Puissance active</span><span class="un">watt · W</span>
+          <p>Ce qui chauffe, éclaire, fait tourner. Intégrée dans le temps, elle devient les kWh de la facture.</p>
+          <span class="who">Concerne votre facture.</span>
+          <span class="ex">Radiateur 2 000 W → 2 000 VA</span>
+        </div>
+        <div class="unit">
+          <span class="sym c-q">Q</span>
+          <span class="nm">Puissance réactive</span><span class="un">voltampère réactif · var</span>
+          <p>L'énergie qui fait l'aller-retour entre le réseau et les bobinages d'un moteur pour créer son champ magnétique. Elle ne produit rien mais occupe les câbles.</p>
+          <span class="who">Non facturée aux particuliers.</span>
+          <span class="ex">Pompe 1 100 W, cos φ 0,78 → 880 var</span>
+        </div>
+        <div class="unit">
+          <span class="sym c-d">D</span>
+          <span class="nm">Puissance déformante</span><span class="un">voltampère · VA</span>
+          <p>Les alimentations électroniques sans correction tirent le courant par impulsions, au sommet de la tension. Ces harmoniques sont du courant qui ne travaille pas.</p>
+          <span class="who">Chargeurs, box, LED bas de gamme.</span>
+          <span class="ex">Chargeur 60 W, λ 0,63 → 95 VA</span>
+        </div>
+        <div class="unit">
+          <span class="sym c-s">S</span>
+          <span class="nm">Puissance apparente</span><span class="un">voltampère · VA</span>
+          <p>Tension efficace × courant efficace. C'est la charge réelle des câbles et du compteur, et c'est elle que le Linky compare à votre abonnement.</p>
+          <span class="who">Concerne votre disjoncteur.</span>
+          <span class="ex">Pompe 1 100 W, cos φ 0,78 → 1 410 VA</span>
+        </div>
+      </div>
+      <div class="lam-strip">
+        <span>Facteur de puissance typique</span>
+        <span>Radiateur, four, ballon <b>1,00</b></span>
+        <span>PAC et recharge VE <b>0,95–0,99</b></span>
+        <span>Moteur de pompe <b>0,75–0,85</b></span>
+        <span>Petite alimentation <b>0,5–0,7</b></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIMULATOR -->
+  <section id="foyer" class="sec">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Simulation · 24 h au pas d'une minute</p>
+        <h2>Une journée dans un foyer français</h2>
+        <p class="sec-lede">Choisissez un scénario puis modifiez-le. La courbe montre à chaque minute ce que vous payez (W) et ce que le compteur surveille (VA). Déplacez le curseur pour lire l'instant sur le compteur.</p>
+      </div>
+      <div class="presets" id="presets"></div>
+      <p class="custom-note" id="customNote" hidden>Scénario personnalisé à partir de vos réglages.</p>
+
+      <div class="foyer">
+        <aside class="card cfg" aria-label="Réglages du foyer">
+          <div class="grp">
+            <h3>Contexte</h3>
+            <div class="field"><span class="flabel">Saison</span>
+              <div class="seg" data-key="season"><button type="button" data-v="hiver">Hiver</button><button type="button" data-v="mi">Mi-saison</button><button type="button" data-v="ete">Été</button></div></div>
+            <div class="field"><span class="flabel">Ciel</span>
+              <div class="seg" data-key="meteo"><button type="button" data-v="clair">Dégagé</button><button type="button" data-v="voile">Voilé</button><button type="button" data-v="couvert">Couvert</button></div></div>
+            <div class="field"><span class="flabel">Puissance souscrite</span>
+              <div class="stepper"><button type="button" id="psDown" aria-label="Diminuer l'abonnement">−</button><output id="psOut"></output><button type="button" id="psUp" aria-label="Augmenter l'abonnement">+</button></div>
+              <span class="hint" id="psHint"></span></div>
+          </div>
+          <div class="grp">
+            <h3>Chauffage</h3>
+            <div class="seg" data-key="heat"><button type="button" data-v="conv">Convecteurs</button><button type="button" data-v="pac">PAC</button><button type="button" data-v="gaz">Gaz</button><button type="button" data-v="poele">Granulés</button></div>
+            <div class="field" id="heatPowF">
+              <div class="frow"><label class="flabel" for="heatPow" id="heatPowL">Puissance installée</label><output class="fval" id="heatPowO"></output></div>
+              <input type="range" id="heatPow">
+            </div>
+            <label class="swrow" id="appointF"><input type="checkbox" class="sw" id="appoint">Appoint résistif 3 kW le matin</label>
+            <svg class="strip" id="stHeat" viewBox="0 0 240 20" preserveAspectRatio="none" aria-hidden="true"></svg>
+          </div>
+          <div class="grp">
+            <h3>Eau chaude et production</h3>
+            <div class="field"><span class="flabel">Ballon 2,4 kW</span>
+              <div class="seg" data-key="ecs"><button type="button" data-v="hc">Heures creuses</button><button type="button" data-v="midi">Midi solaire</button><button type="button" data-v="non">Non électrique</button></div></div>
+            <svg class="strip" id="stEcs" viewBox="0 0 240 20" preserveAspectRatio="none" aria-hidden="true"></svg>
+            <div class="field">
+              <div class="frow"><label class="flabel" for="pv">Panneaux photovoltaïques</label><output class="fval" id="pvO"></output></div>
+              <input type="range" id="pv" min="0" max="12" step="0.5">
+            </div>
+            <svg class="strip" id="stPv" viewBox="0 0 240 20" preserveAspectRatio="none" aria-hidden="true"></svg>
+          </div>
+          <div class="grp">
+            <h3>Voiture électrique</h3>
+            <label class="swrow"><input type="checkbox" class="sw" id="ev">Recharge quotidienne de 14 kWh</label>
+            <fieldset id="evOpts">
+              <div class="field"><span class="flabel">Puissance de charge</span>
+                <div class="seg" data-key="evPow"><button type="button" data-v="2300">2,3 kW</button><button type="button" data-v="3700">3,7 kW</button><button type="button" data-v="7400">7,4 kW</button></div></div>
+              <div class="field"><span class="flabel">Démarrage</span>
+                <div class="seg" data-key="evMode"><button type="button" data-v="hc">22 h (HC)</button><button type="button" data-v="arrivee">18 h 30 (retour)</button></div></div>
+              <label class="swrow"><input type="checkbox" class="sw" id="delest">Délestage piloté par la TIC</label>
+              <svg class="strip" id="stEv" viewBox="0 0 240 20" preserveAspectRatio="none" aria-hidden="true"></svg>
+              <span class="ev-info" id="evInfo"></span>
+            </fieldset>
+          </div>
+          <div class="grp">
+            <h3>Appareils</h3>
+            <ul class="apps" id="appList"></ul>
+          </div>
+        </aside>
+
+        <div class="main">
+          <div class="card verdict" id="verdict" aria-live="polite"></div>
+          <div class="kpis" id="kpis"></div>
+
+          <div class="card chart-card">
+            <div class="chart-head">
+              <h3>Courbe de charge</h3>
+              <div class="legend">
+                <span><i class="sw-l" style="background:var(--s)"></i>Apparente S (VA)</span>
+                <span><i class="sw-a" style="background:var(--p);opacity:.45"></i>Active P (W)</span>
+                <span id="lgPv"><i class="sw-dash" style="border-color:var(--pv)"></i>Production</span>
+                <span id="lgInj"><i class="sw-a" style="background:var(--pv);opacity:.5"></i>Injection</span>
+                <span><i class="sw-dash" style="border-color:var(--alert)"></i>Coupure</span>
+              </div>
+            </div>
+            <div class="chart-wrap" id="chartWrap">
+              <svg id="chart" role="img" aria-label="Puissances active et apparente sur 24 heures"></svg>
+              <div class="tip" id="tip"></div>
+            </div>
+            <div class="chart-foot">
+              <button type="button" class="btn" id="play" aria-label="Lire la journée"><svg viewBox="0 0 12 12" id="playIco"><path d="M2 1l9 5-9 5z"/></svg><span id="playTxt">Lire</span></button>
+              <input type="range" id="tRange" min="0" max="1439" step="1" aria-label="Heure de la journée">
+              <output class="tout" id="tOut"></output>
+              <button type="button" class="btn ghost" id="toPeak">Pic VA</button>
+              <button type="button" class="btn ghost" id="nextOver">Dépassement suivant</button>
+            </div>
+          </div>
+
+          <div class="card inst">
+            <div class="meter" aria-label="Compteur simulé">
+              <div class="m-head"><span>COMPTEUR COMMUNICANT</span><span>MONO · SIM.</span></div>
+              <div class="lcd" id="lcd" aria-live="off">
+                <div class="lcd-1"><span id="lcdK"></span><span id="lcdN"></span></div>
+                <div class="lcd-2"><span class="gh" id="lcdG"></span><span class="vv" id="lcdV"></span></div>
+              </div>
+              <div class="m-desc" id="lcdD"></div>
+              <div class="m-ctl">
+                <button type="button" id="lcdPrev" aria-label="Libellé précédent">−</button>
+                <button type="button" id="lcdNext" aria-label="Libellé suivant">+</button>
+                <span class="m-state" id="mState"></span>
+              </div>
+            </div>
+            <div class="inst-r">
+              <h3 id="instTitle"></h3>
+              <div class="ro-grid">
+                <div class="ro"><span class="lbl" id="iSl">Apparente S</span><div class="num c-s"><span id="iS"></span><small>VA</small></div></div>
+                <div class="ro"><span class="lbl" id="iPl">Active P</span><div class="num c-p"><span id="iP"></span><small>W</small></div></div>
+                <div class="ro"><span class="lbl">Facteur λ</span><div class="num"><span id="iL"></span></div></div>
+                <div class="ro"><span class="lbl">Réactive Q</span><div class="num c-q"><span id="iQ"></span><small>var</small></div></div>
+                <div class="ro"><span class="lbl">Déformante D</span><div class="num c-d"><span id="iD"></span><small>VA</small></div></div>
+                <div class="ro"><span class="lbl">Courant I</span><div class="num"><span id="iI"></span><small>A</small></div></div>
+              </div>
+              <svg class="tri" id="simTri" data-h="190" role="img" aria-label="Diagramme des puissances à l'instant choisi"></svg>
+            </div>
+          </div>
+
+          <div class="card bk">
+            <div class="bk-head">
+              <h3 id="bkTitle">Qui consomme ?</h3>
+              <div class="bk-legend"><span><i class="sw-a" style="background:var(--p)"></i>W</span><span><i class="sw-a" style="border:1.5px solid var(--s);background:transparent"></i>VA</span></div>
+            </div>
+            <div id="bkList"></div>
+            <div class="bk-sum" id="bkSum"></div>
+            <p class="bk-note" id="bkNote"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEMO -->
+  <section id="memo" class="sec">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Téléinformation client (TIC) · mode standard</p>
+        <h2>Ce que le Linky mesure vraiment</h2>
+        <p class="sec-lede">Le compteur publie ses mesures sur un bornier, la téléinformation. On y lit ses étiquettes sur l'afficheur avec les touches + et −, ou avec un module branché sur la sortie TIC.</p>
+      </div>
+      <div class="memo">
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <caption>Étiquettes utiles</caption>
+            <thead><tr><th>Étiquette</th><th>Signification</th><th>Unité</th></tr></thead>
+            <tbody>
+              <tr><td class="k c-s">SINSTS</td><td>Puissance apparente instantanée soutirée</td><td class="u">VA</td></tr>
+              <tr><td class="k c-pv">SINSTI</td><td>Puissance apparente instantanée injectée (producteurs)</td><td class="u">VA</td></tr>
+              <tr><td class="k c-s">SMAXSN</td><td>Puissance apparente maximale soutirée du jour</td><td class="u">VA</td></tr>
+              <tr><td class="k c-p">EAST</td><td>Index d'énergie active soutirée totale</td><td class="u">Wh</td></tr>
+              <tr><td class="k c-pv">EAIT</td><td>Index d'énergie active injectée totale</td><td class="u">Wh</td></tr>
+              <tr><td class="k c-q">ERQ1…4</td><td>Énergie réactive par quadrant</td><td class="u">varh</td></tr>
+              <tr><td class="k">IRMS1 · URMS1</td><td>Courant et tension efficaces, phase 1</td><td class="u">A · V</td></tr>
+              <tr><td class="k">PREF · PCOUP</td><td>Puissance de référence (abonnement) et de coupure</td><td class="u">kVA</td></tr>
+              <tr><td class="k">PAPP · IINST</td><td>Équivalents en mode historique : apparente et courant</td><td class="u">VA · A</td></tr>
+            </tbody>
+          </table>
+          <p class="callout">Aucune étiquette ne donne la <b>puissance active instantanée</b>. Pour obtenir des watts, on mesure la progression de l'index <b>EAST</b> dans le temps : 25 Wh en une minute font 1 500 W.</p>
+        </div>
+        <div class="memo-r">
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <caption>Abonnements en monophasé</caption>
+              <thead><tr><th>Souscrit</th><th>Courant à 230 V</th><th>ISOUSC</th></tr></thead>
+              <tbody>
+                <tr><td class="num">3 kVA</td><td class="num">13 A</td><td class="num">15 A</td></tr>
+                <tr><td class="num">6 kVA</td><td class="num">26 A</td><td class="num">30 A</td></tr>
+                <tr><td class="num">9 kVA</td><td class="num">39 A</td><td class="num">45 A</td></tr>
+                <tr><td class="num">12 kVA</td><td class="num">52 A</td><td class="num">60 A</td></tr>
+                <tr><td class="num">15 kVA</td><td class="num">65 A</td><td class="num">75 A</td></tr>
+                <tr><td class="num">18 kVA</td><td class="num">78 A</td><td class="num">90 A</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h3 style="margin-bottom:12px">À retenir</h3>
+            <ol class="keep">
+              <li><span>Le fournisseur facture l'<b>énergie active</b>, en kWh.</span></li>
+              <li><span>L'abonnement plafonne la <b>puissance apparente</b>, en kVA. Le Linky ouvre son organe de coupure quand elle dépasse PCOUP.</span></li>
+              <li><span>Les VA ne s'additionnent pas comme des nombres : déphasages et harmoniques se combinent comme des vecteurs.</span></li>
+              <li><span>Avec du solaire, les W soutirés chutent mais pas les var : le facteur de puissance vu par le compteur s'effondre en journée.</span></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap"><p>Modèle simplifié : tension nominale 230 V avec chute en charge, harmoniques regroupées, profils d'usage types. Le vrai compteur applique une tolérance et une temporisation avant de couper ; ici, toute minute au-dessus de PCOUP est comptée comme un dépassement.</p></div>
+</footer>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const N = 1440, U0 = 230;
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mk = d => new Intl.NumberFormat('fr-FR', {minimumFractionDigits: d, maximumFractionDigits: d});
+const F0 = mk(0), F1 = mk(1), F2 = mk(2);
+const f0 = x => F0.format(Math.round(x));
+const kv = w => (Math.abs(w) >= 9950 || Math.abs(w) % 1000 < 50 || Math.abs(w) % 1000 > 950) ? F0.format(Math.round(w / 1000)) : F1.format(w / 1000);
+const hm = (h, m = 0) => h * 60 + m;
+const hhmm = t => { t = ((Math.round(t) % N) + N) % N; return String(t / 60 | 0).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
+const dur = m => { m = Math.round(m); const h = m / 60 | 0, r = m % 60; return h ? `${h} h ${String(r).padStart(2, '0')}` : `${r} min`; };
+const inR = (t, a, b) => { a = ((a % N) + N) % N; b = ((b % N) + N) % N; return a <= b ? (t >= a && t < b) : (t >= a || t < b); };
+const cyc = (t, P, d, o) => d <= 0 ? false : d >= 1 ? true : ((t + o) % P) < P * d;
+const hyp = (a, b, c = 0) => Math.sqrt(a * a + b * b + c * c);
+const kq = c => Math.sqrt(Math.max(0, 1 - c * c)) / c;
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const lamOf = (cos, d) => 1 / Math.sqrt(1 / (cos * cos) + d * d);
+
+function makeNoise(seed, step) {
+  let s = seed >>> 0;
+  const r = () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
+  const a = []; for (let i = 0; i <= Math.ceil(N / step) + 1; i++) a.push(r());
+  return t => { t = ((t % N) + N) % N; const i = Math.floor(t / step), f = (t - i * step) / step, e = f * f * (3 - 2 * f); return a[i] * (1 - e) + a[i + 1] * e; };
+}
+const nz3 = makeNoise(99, 3), nz5 = makeNoise(7, 5), nz20 = makeNoise(42, 20);
+
+/* ========================== LAB ========================== */
+const lab = {P: 2000, phi: 0, h: 0, preset: 'radiateur'};
+const LAB_PRESETS = {
+  radiateur: {P: 2000, phi: 0, h: 0},
+  moteur: {P: 1100, phi: 39, h: .05},
+  chargeur: {P: 300, phi: 6, h: 1.2},
+  capa: {P: 600, phi: -45, h: 0}
+};
+function labCalc() {
+  const ph = lab.phi * Math.PI / 180, c = Math.cos(ph), s = Math.sin(ph);
+  const I1 = lab.P / (U0 * c), I3 = lab.h * I1, I = Math.hypot(I1, I3);
+  return {P: lab.P, I1, I3, I, S: U0 * I, Q: U0 * I1 * s, D: U0 * I3, lam: lab.P / (U0 * I), cos: c, ph};
+}
+function niceAmp(v) {
+  const e = Math.pow(10, Math.floor(Math.log10(Math.max(v, 1e-6))));
+  for (const k of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (k * e >= v) return k * e;
+  return 10 * e;
+}
+let SG = null, phase = 0;
+function buildScope() {
+  const svg = $('#scope'); const W = Math.max(300, svg.clientWidth || 600); const H = W < 520 ? 300 : 340;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.style.height = H + 'px';
+  const r = labCalc();
+  const L = 50, Rr = 46, T = 8, B = 22, G = 20;
+  const H1 = Math.round((H - T - B - G) * .58), topY = T, botY = T + H1 + G, botH = H - B - botY;
+  const up = U0 * Math.SQRT2, ipk = Math.SQRT2 * (r.I1 + r.I3);
+  const iA = niceAmp(Math.max(ipk * 1.1, 2));
+  let pmax = 0, pmin = 0;
+  for (let k = 0; k < 400; k++) {
+    const th = 2 * Math.PI * k / 400;
+    const p = up * Math.sin(th) * Math.SQRT2 * (r.I1 * Math.sin(th - r.ph) - r.I3 * Math.sin(3 * (th - r.ph)));
+    pmax = Math.max(pmax, p); pmin = Math.min(pmin, p);
+  }
+  const pA = niceAmp(Math.max(pmax, -pmin, 100) * 1.08);
+  const xw = W - L - Rr;
+  SG = {W, H, L, Rr, xw, topY, H1, botY, botH, up, iA, pA, r};
+  const yu = v => topY + H1 / 2 - v / up * (H1 / 2) * .86;
+  const yp = v => botY + botH / 2 - v / pA * (botH / 2);
+  let g = `<rect class="scr" x="${L}" y="${topY}" width="${xw}" height="${H1}" rx="4"/><rect class="scr" x="${L}" y="${botY}" width="${xw}" height="${botH}" rx="4"/>`;
+  for (let i = 1; i < 8; i++) { const x = L + xw * i / 8; g += `<line class="gl" x1="${x}" x2="${x}" y1="${topY}" y2="${topY + H1}"/><line class="gl" x1="${x}" x2="${x}" y1="${botY}" y2="${botY + botH}"/>`; }
+  for (let i = 1; i < 4; i++) { const y = topY + H1 * i / 4; g += `<line class="${i === 2 ? 'gl0' : 'gl'}" x1="${L}" x2="${L + xw}" y1="${y}" y2="${y}"/>`; }
+  g += `<line class="gl0" x1="${L}" x2="${L + xw}" y1="${yp(0)}" y2="${yp(0)}"/>`;
+  g += `<text x="${L - 6}" y="${yu(up) + 4}" text-anchor="end">+325 V</text><text x="${L - 6}" y="${yu(0) + 4}" text-anchor="end">0</text><text x="${L - 6}" y="${yu(-up) + 4}" text-anchor="end">−325 V</text>`;
+  const iy = v => topY + H1 / 2 - v / iA * (H1 / 2);
+  g += `<text class="t-s" x="${L + xw + 6}" y="${iy(iA) + 10}">+${F0.format(iA)} A</text><text class="t-s" x="${L + xw + 6}" y="${iy(-iA) - 2}">−${F0.format(iA)} A</text>`;
+  const pl = v => (v >= 1000 ? kv(v) + ' kW' : F0.format(v) + ' W');
+  g += `<text x="${L - 6}" y="${botY + 10}" text-anchor="end">+${pl(pA)}</text><text x="${L - 6}" y="${botY + botH}" text-anchor="end">−${pl(pA)}</text>`;
+  g += `<text x="${L + 8}" y="${botY + 13}" class="t-ink">p(t) = u × i</text>`;
+  for (let i = 0; i <= 4; i++) g += `<text x="${L + xw * i / 4}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === 4 ? 'end' : 'middle'}">${i * 10}${i === 4 ? ' ms' : ''}</text>`;
+  g += `<path class="ar-pos" id="sPpos"/><path class="ar-neg" id="sPneg"/><path class="tr-p" id="sP"/>`;
+  g += `<line class="pm" x1="${L}" x2="${L + xw}" y1="${yp(r.P)}" y2="${yp(r.P)}"/>`;
+  g += `<text class="t-p" x="${L + xw - 6}" y="${yp(r.P) - 5}" text-anchor="end">P = ${f0(r.P)} W (moyenne)</text>`;
+  g += `<path class="tr-u" id="sU"/><path class="tr-i" id="sI"/>`;
+  svg.innerHTML = g;
+  SG.yu = yu; SG.iy = iy; SG.yp = yp;
+  drawTraces();
+}
+function drawTraces() {
+  if (!SG) return;
+  const {L, xw, up, r, yu, iy, yp} = SG, M = 260;
+  let du = '', di = '', dp = '', pos = '', neg = '';
+  const y0 = yp(0);
+  for (let k = 0; k <= M; k++) {
+    const x = (L + xw * k / M).toFixed(1), th = 4 * Math.PI * k / M + phase;
+    const u = up * Math.sin(th);
+    const i = Math.SQRT2 * (r.I1 * Math.sin(th - r.ph) - r.I3 * Math.sin(3 * (th - r.ph)));
+    const p = u * i, c = k ? 'L' : 'M';
+    du += c + x + ' ' + yu(u).toFixed(1);
+    di += c + x + ' ' + iy(i).toFixed(1);
+    dp += c + x + ' ' + yp(p).toFixed(1);
+    pos += 'L' + x + ' ' + yp(Math.max(p, 0)).toFixed(1);
+    neg += 'L' + x + ' ' + yp(Math.min(p, 0)).toFixed(1);
+  }
+  $('#sU').setAttribute('d', du); $('#sI').setAttribute('d', di); $('#sP').setAttribute('d', dp);
+  $('#sPpos').setAttribute('d', `M${L} ${y0}${pos}L${L + xw} ${y0}Z`);
+  $('#sPneg').setAttribute('d', `M${L} ${y0}${neg}L${L + xw} ${y0}Z`);
+}
+function renderLab() {
+  const r = labCalc();
+  $('#lP').value = lab.P; $('#lPhi').value = lab.phi; $('#lH').value = Math.round(lab.h * 100);
+  $('#lPo').textContent = f0(lab.P) + ' W';
+  $('#lPhio').textContent = `${lab.phi > 0 ? '+' : ''}${lab.phi}° · cos φ ${F2.format(r.cos)}`;
+  $('#lPhiH').textContent = lab.phi > 2 ? 'Inductif : le courant est en retard sur la tension (moteur, bobine).' : lab.phi < -2 ? 'Capacitif : le courant est en avance (condensateur, filtre).' : 'En phase : le courant suit la tension.';
+  $('#lHo').textContent = Math.round(lab.h * 100) + ' %';
+  $$('#labPresets button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lp === lab.preset));
+  $('#rP').textContent = f0(r.P); $('#rQ').textContent = f0(r.Q); $('#rD').textContent = f0(r.D);
+  $('#rS').textContent = f0(r.S); $('#rI').textContent = F1.format(r.I); $('#rL').textContent = F2.format(r.lam);
+  $('#barS').style.width = '100%'; $('#barP').style.width = (r.lam * 100).toFixed(1) + '%';
+  $('#barPv').textContent = f0(r.P) + ' W'; $('#barSv').textContent = f0(r.S) + ' VA';
+  const ref = r.P / U0;
+  $('#labSay').innerHTML = r.lam > .995
+    ? `Charge résistive : tout le courant travaille. <b>${F1.format(r.I)} A</b> pour ${f0(r.P)} W, donc P = S.`
+    : `Pour fournir ${f0(r.P)} W, le réseau fait passer <b>${F1.format(r.I)} A</b> au lieu de ${F1.format(ref)} A, soit <b>${F2.format(1 / r.lam)} fois</b> le courant d'un radiateur de même puissance. Les câbles chauffent et le compteur compte ${f0(r.S)} VA.`;
+  buildScope();
+  drawTriangle($('#labTri'), r.P, r.Q, r.D);
+}
+$('#labPresets').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  Object.assign(lab, LAB_PRESETS[b.dataset.lp]); lab.preset = b.dataset.lp; renderLab();
+});
+$('#lP').addEventListener('input', e => { lab.P = +e.target.value; lab.preset = null; renderLab(); });
+$('#lPhi').addEventListener('input', e => { lab.phi = +e.target.value; lab.preset = null; renderLab(); });
+$('#lH').addEventListener('input', e => { lab.h = +e.target.value / 100; lab.preset = null; renderLab(); });
+
+let scopeVisible = true;
+if ('IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(en => scopeVisible = en.isIntersecting)).observe($('#scope'));
+if (!RM) (function loop() { if (scopeVisible && !document.hidden) { phase = (phase + .018) % (Math.PI * 2); drawTraces(); } requestAnimationFrame(loop); })();
+
+/* ===================== POWER DIAGRAM ===================== */
+function drawTriangle(svg, P, Q, D) {
+  const W = Math.max(220, svg.clientWidth || 300), H = +svg.dataset.h || 200;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.style.height = H + 'px';
+  const S = hyp(P, Q, D);
+  if (S < 1) { svg.innerHTML = `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" class="t-mute">Aucune charge</text>`; return; }
+  const dx = .66, dy = .42;
+  const pts = [[0, 0], [P, 0], [P, Q], [P + D * dx, Q + D * dy]];
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const px = Math.min(96, W * .3), py = 24;
+  const sx = (x1 - x0) > 1e-6 ? (W - 2 * px) / (x1 - x0) : Infinity, sy = (y1 - y0) > 1e-6 ? (H - 2 * py) / (y1 - y0) : Infinity;
+  let k = Math.min(sx, sy); if (!isFinite(k)) k = 1;
+  const ox = (W - (x1 - x0) * k) / 2 - x0 * k, oy = (H + (y1 - y0) * k) / 2 + y0 * k;
+  const M = ([x, y]) => [ox + x * k, oy - y * k];
+  const [O, A, B, C] = pts.map(M);
+  const ln = (a, b, c) => `<line class="v ${c}" x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}"/>`;
+  const tiny = S * .015;
+  let g = '';
+  if (Math.abs(Q) > tiny && Math.abs(P) > tiny) {
+    const sxn = Math.sign(O[0] - A[0]) * 9, syn = Q > 0 ? -9 : 9;
+    g += `<path class="ra" d="M${A[0] + sxn} ${A[1]}L${A[0] + sxn} ${A[1] + syn}L${A[0]} ${A[1] + syn}"/>`;
+  }
+  if (Math.abs(P) > tiny) g += ln(O, A, 'v-p');
+  if (Math.abs(Q) > tiny) g += ln(A, B, 'v-q');
+  if (D > tiny) g += ln(B, C, 'v-d');
+  g += ln(O, C, 'v-s');
+  const t = (x, y, txt, cls, anc = 'middle') => `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anc}" class="${cls}">${txt}</text>`;
+  if (Math.abs(P) > tiny) g += t((O[0] + A[0]) / 2, A[1] + (Q < -tiny ? -8 : 16), `P ${f0(P)} W`, 't-p');
+  if (Math.abs(Q) > tiny) { const right = A[0] >= O[0]; g += t(A[0] + (right ? 8 : -8), (A[1] + B[1]) / 2 + 4, `Q ${f0(Q)} var`, 't-q', right ? 'start' : 'end'); }
+  if (D > tiny) { const right = C[0] < W - 80; g += t(C[0] + (right ? 6 : -6), C[1] - 6, `D ${f0(D)}`, 't-d', right ? 'start' : 'end'); }
+  const vx = C[0] - O[0], vy = C[1] - O[1], L = Math.hypot(vx, vy) || 1;
+  let nx = vy / L, ny = -vx / L; if (ny > 0) { nx = -nx; ny = -ny; }
+  const anc = nx < -.3 ? 'end' : nx > .3 ? 'start' : 'middle';
+  g += t((O[0] + C[0]) / 2 + nx * 12, (O[1] + C[1]) / 2 + ny * 12 + 4, `S ${f0(S)} VA`, 't-s', anc);
+  svg.innerHTML = g;
+}
+
+/* ======================= SIMULATOR ======================= */
+const SEAS = {
+  hiver: {rise: 8.6, set: 17.4, peak: .55, heat: 1},
+  mi: {rise: 7.4, set: 19.8, peak: .72, heat: .38},
+  ete: {rise: 6.3, set: 21.7, peak: .8, heat: 0}
+};
+const HEAT_PROF = [.5, .48, .46, .46, .48, .56, .9, .95, .8, .46, .38, .34, .32, .32, .34, .38, .5, .72, .84, .86, .8, .72, .62, .55];
+const heatK = c => SEAS[c.season].heat;
+const TIERS = [3, 6, 9, 12, 15, 18, 24, 30, 36];
+const tierFor = va => TIERS.find(k => k * 1000 >= va) ?? null;
+
+const CAT = {
+  conv: {name: 'Convecteurs', cos: 1, d: 0, fn(t, c) {
+    const k = heatK(c); if (!k) return 0;
+    const n = Math.max(1, Math.round(c.heatPow / 1500)), u = c.heatPow / n, duty = Math.min(1, HEAT_PROF[t / 60 | 0] * k * 1.05);
+    let p = 0; for (let i = 0; i < n; i++) if (cyc(t, 16, duty, 3 + Math.round(i * 16 / n))) p += u; return p; }},
+  pac: {name: 'Pompe à chaleur', cos: .98, d: .12, fn(t, c) {
+    const k = heatK(c); if (!k) return 0;
+    return c.heatPow * Math.min(1, HEAT_PROF[t / 60 | 0] * (k === 1 ? 1 : k * 1.25)) * (.88 + .24 * nz5(t * 3)); }},
+  appoint: {name: 'Appoint résistif PAC', cos: 1, d: 0, fn(t, c) { return c.season === 'hiver' && c.appoint && inR(t, hm(6), hm(7, 40)) ? 3000 : 0; }},
+  gaz: {name: 'Chaudière gaz (électronique)', cos: .9, d: .45, fn(t, c) {
+    if (!heatK(c)) return 8;
+    const on = c.season === 'hiver' ? inR(t, hm(5, 30), hm(23)) : (inR(t, hm(6), hm(9)) || inR(t, hm(17, 30), hm(22, 30)));
+    return on ? 95 : 8; }},
+  poele: {name: 'Poêle à granulés', cos: .85, d: .3, fn(t, c) {
+    if (!heatK(c)) return 2;
+    const runs = c.season === 'hiver' ? [[hm(6, 15), hm(22, 45)]] : [[hm(6, 45), hm(9)], [hm(18), hm(22)]];
+    for (const [a, b] of runs) if (inR(t, a, b)) return (t - a) < 12 ? [[320, 1, 0], [40, .85, .3]] : 55;
+    return 2; }},
+  ecs: {name: "Ballon d'eau chaude", cos: 1, d: 0, fn(t, c) {
+    if (c.ecs === 'non') return 0;
+    const du = {hiver: 150, mi: 120, ete: 85}[c.season], a = c.ecs === 'hc' ? hm(23) : hm(11, 30);
+    return inR(t, a, a + du) ? 2400 : 0; }},
+  induction: {name: 'Plaques à induction', nom: 3600, cos: .97, d: .2, g: 'Cuisine', fn(t) {
+    if (inR(t, hm(12, 10), hm(12, 35))) return 2100;
+    if (inR(t, hm(19, 20), hm(19, 32))) return 3600;
+    if (inR(t, hm(19, 32), hm(19, 52))) return 1900; return 0; }},
+  four: {name: 'Four', nom: 2500, cos: 1, d: 0, g: 'Cuisine', fn(t) {
+    if (inR(t, hm(18, 55), hm(19, 8))) return 2500;
+    if (inR(t, hm(19, 8), hm(19, 55))) return cyc(t, 6, .55, 0) ? 2500 : 0; return 0; }},
+  petit: {name: 'Bouilloire, micro-ondes, grille-pain', nom: 2200, cos: .96, d: .2, lam: 'λ 0,85–1', g: 'Cuisine', fn(t) {
+    if (inR(t, hm(7, 10), hm(7, 13)) || inR(t, hm(16, 30), hm(16, 33))) return [[2200, 1, 0]];
+    if (inR(t, hm(7, 14), hm(7, 17))) return [[900, 1, 0]];
+    if (inR(t, hm(12, 40), hm(12, 43)) || inR(t, hm(19, 56), hm(19, 59))) return [[1250, .92, .35]];
+    return 0; }},
+  laveLinge: {name: 'Lave-linge', nom: 2000, cos: .6, d: .2, lam: 'λ variable', g: 'Linge et vaisselle', fn(t) {
+    if (inR(t, hm(9), hm(9, 18))) return [[2000, 1, 0], [180, .6, .2]];
+    if (inR(t, hm(9, 18), hm(10, 18))) return [[cyc(t, 4, .6, 0) ? 220 : 40, .6, .2]];
+    if (inR(t, hm(10, 18), hm(10, 28))) return [[480, .72, .25]]; return 0; }},
+  laveVaisselle: {name: 'Lave-vaisselle', nom: 2000, cos: .7, d: .2, lam: 'λ variable', g: 'Linge et vaisselle', fn(t) {
+    if (inR(t, hm(21), hm(21, 16)) || inR(t, hm(22, 4), hm(22, 18))) return [[1950, 1, 0], [70, .6, .2]];
+    if (inR(t, hm(21, 16), hm(22, 4)) || inR(t, hm(22, 18), hm(22, 40))) return [[70, .6, .2]]; return 0; }},
+  seche: {name: 'Sèche-linge', nom: 2500, cos: .95, d: .05, lam: 'λ variable', g: 'Linge et vaisselle', fn(t) {
+    if (inR(t, hm(14), hm(15, 40))) return [[cyc(t, 5, .72, 0) ? 2300 : 0, 1, 0], [200, .62, .15]]; return 0; }},
+  froid: {name: 'Réfrigérateur, congélateur', nom: 250, cos: .65, d: .15, g: 'Toujours branché', fn(t) {
+    let p = 0; if (cyc(t, 40, .35, 0)) p += 140; if (cyc(t, 45, .3, 17)) p += 110; return p; }},
+  electro: {name: 'Box, veilles, VMC', nom: 115, cos: .9, d: 1.1, g: 'Toujours branché', fn(t) { return 95 + 20 * nz5(t * 7); }},
+  eclairage: {name: 'Éclairage LED', nom: 180, cos: .9, d: .95, g: 'Toujours branché', fn(t, c) {
+    const ev = {hiver: hm(17, 15), mi: hm(19, 15), ete: hm(21)}[c.season];
+    if (inR(t, hm(6, 45), hm(8, 15))) return c.season === 'ete' ? 0 : 70;
+    return inR(t, ev, hm(23, 30)) ? 180 : 0; }},
+  teletravail: {name: 'Télétravail : PC et écrans', nom: 160, cos: .98, d: .3, g: 'Vie quotidienne', fn(t) {
+    return (inR(t, hm(8, 45), hm(12, 15)) || inR(t, hm(13, 30), hm(18))) ? 150 + 20 * nz5(t * 5) : 0; }},
+  tv: {name: 'TV, console, hi-fi', nom: 220, cos: .97, d: .8, g: 'Vie quotidienne', fn(t) { return inR(t, hm(20, 10), hm(23, 15)) ? 210 : 0; }},
+  piscine: {name: 'Pompe de piscine', nom: 1100, cos: .78, d: .08, g: 'Extérieur et confort', fn(t, c) {
+    const r = {ete: [hm(10), hm(20)], mi: [hm(11), hm(17)], hiver: [hm(6), hm(8)]}[c.season];
+    return inR(t, r[0], r[1]) ? 1100 : 0; }},
+  clim: {name: 'Climatisation', nom: 1500, cos: .96, d: .25, g: 'Extérieur et confort', fn(t, c) {
+    if (c.season !== 'ete') return 0;
+    return inR(t, hm(13), hm(19, 30)) ? 900 + 600 * nz20(t * 2) : 0; }}
+};
+const HEAT = {
+  conv: {ids: ['conv'], range: [1500, 12000, 500], def: 4500, label: 'Puissance installée'},
+  pac: {ids: ['pac', 'appoint'], range: [1000, 5000, 250], def: 3000, label: 'Puissance électrique PAC'},
+  gaz: {ids: ['gaz']},
+  poele: {ids: ['poele']}
+};
+const TOGGLES = ['induction', 'four', 'petit', 'laveLinge', 'laveVaisselle', 'seche', 'froid', 'electro', 'eclairage', 'teletravail', 'tv', 'piscine', 'clim'];
+const NUMKEYS = new Set(['evPow']);
+const EV_E = 14000, EV_MIN = 1380;
+
+const PRESETS = {
+  appart: {label: 'Appartement tout électrique', sub: 'Convecteurs, cuisson, 9 kVA',
+    s: {season: 'hiver', meteo: 'couvert', ps: 9, heat: 'conv', heatPow: 4500, appoint: false, pv: 0, ecs: 'hc', ev: false, evPow: 7400, evMode: 'hc', delest: false,
+      apps: ['induction', 'four', 'petit', 'laveLinge', 'laveVaisselle', 'froid', 'electro', 'eclairage', 'tv']}},
+  pacve: {label: 'Maison PAC et voiture', sub: 'Recharge 7,4 kW au retour, 9 kVA',
+    s: {season: 'hiver', meteo: 'voile', ps: 9, heat: 'pac', heatPow: 3000, appoint: true, pv: 0, ecs: 'hc', ev: true, evPow: 7400, evMode: 'arrivee', delest: false,
+      apps: ['induction', 'four', 'petit', 'laveLinge', 'laveVaisselle', 'seche', 'froid', 'electro', 'eclairage', 'teletravail', 'tv']}},
+  solaire: {label: 'Maison solaire et piscine', sub: '6 kWc, été, 9 kVA',
+    s: {season: 'ete', meteo: 'clair', ps: 9, heat: 'pac', heatPow: 3000, appoint: false, pv: 6, ecs: 'midi', ev: true, evPow: 3700, evMode: 'hc', delest: false,
+      apps: ['induction', 'petit', 'laveLinge', 'laveVaisselle', 'froid', 'electro', 'eclairage', 'teletravail', 'tv', 'piscine', 'clim']}},
+  studio: {label: 'Studio chauffé au gaz', sub: 'Petits appareils, 3 kVA',
+    s: {season: 'mi', meteo: 'voile', ps: 3, heat: 'gaz', heatPow: 3000, appoint: false, pv: 0, ecs: 'non', ev: false, evPow: 3700, evMode: 'hc', delest: false,
+      apps: ['petit', 'laveLinge', 'froid', 'electro', 'eclairage', 'teletravail', 'tv']}}
+};
+
+const state = {preset: 'pacve', t: 0, apps: {}};
+function applyPreset(id) {
+  const s = PRESETS[id].s;
+  Object.assign(state, s, {preset: id, apps: {}});
+  TOGGLES.forEach(k => state.apps[k] = s.apps.includes(k));
+}
+
+function pvAt(t, c) {
+  if (!c.pv) return 0;
+  const s = SEAS[c.season], h = t / 60;
+  if (h <= s.rise || h >= s.set) return 0;
+  let f = Math.pow(Math.sin(Math.PI * (h - s.rise) / (s.set - s.rise)), 1.35) * s.peak;
+  if (c.meteo === 'voile') f *= clamp(.32 + .55 * nz20(t) - (nz5(t * 2) < .32 ? .22 : 0), .08, 1);
+  else if (c.meteo === 'couvert') f *= .13 + .1 * nz20(t);
+  else f *= .97 + .03 * nz5(t);
+  return c.pv * 1000 * f;
+}
+
+let R = null;
+function simulate() {
+  const c = state, apps = {};
+  const P = new Float64Array(N), Q = new Float64Array(N), D = new Float64Array(N), PV = new Float64Array(N);
+  const heatIds = HEAT[c.heat].ids;
+  for (const id of [...heatIds, 'ecs', ...TOGGLES]) {
+    const a = CAT[id], ap = {P: new Float64Array(N), Q: new Float64Array(N), D: new Float64Array(N)};
+    ap.on = id === 'ecs' ? c.ecs !== 'non' : heatIds.includes(id) ? true : !!c.apps[id];
+    for (let t = 0; t < N; t++) {
+      let r = a.fn(t, c); if (!r) continue;
+      if (typeof r === 'number') r = [[r, a.cos, a.d]];
+      for (const [p, cs, d] of r) { if (p <= 0) continue; ap.P[t] += p; ap.Q[t] += p * kq(cs); ap.D[t] += p * d; }
+    }
+    apps[id] = ap;
+    if (ap.on) for (let t = 0; t < N; t++) { P[t] += ap.P[t]; Q[t] += ap.Q[t]; D[t] += ap.D[t]; }
+  }
+  for (let t = 0; t < N; t++) PV[t] = pvAt(t, c);
+
+  // Electric vehicle, simulated after the rest so the load manager can read the meter
+  const ev = {P: new Float64Array(N), Q: new Float64Array(N), D: new Float64Array(N), on: !!c.ev, got: 0, start: null, end: null, slowed: 0};
+  if (c.ev) {
+    const start = c.evMode === 'hc' ? hm(22) : hm(18, 30), lim = c.ps * 1000 * .95, eq = kq(.99), ed = .08;
+    ev.start = start;
+    for (let k = 0; k < N && ev.got < EV_E - .5; k++) {
+      const t = (start + k) % N;
+      let p = Math.min(c.evPow, (EV_E - ev.got) * 60);
+      if (ev.got > EV_E * .93) p = Math.min(p, c.evPow * .5);
+      if (c.delest) {
+        const po = P[t] - PV[t], qo = Q[t], dd = D[t];
+        const fits = x => hyp(po + x, qo + x * eq, dd + x * ed) <= lim;
+        if (!fits(p)) {
+          let lo = 0, hi = p; for (let i = 0; i < 14; i++) { const m = (lo + hi) / 2; if (fits(m)) lo = m; else hi = m; }
+          p = lo >= EV_MIN ? lo : 0; ev.slowed++;
+        }
+      }
+      if (p > 0) { ev.P[t] = p; ev.Q[t] = p * eq; ev.D[t] = p * ed; ev.got += p / 60; ev.end = t + 1; }
+    }
+    for (let t = 0; t < N; t++) { P[t] += ev.P[t]; Q[t] += ev.Q[t]; D[t] += ev.D[t]; }
+  }
+  apps.ve = ev;
+
+  const Pn = new Float64Array(N), S = new Float64Array(N), U = new Float64Array(N), I = new Float64Array(N);
+  const over = new Uint8Array(N), cumE = new Float64Array(N), cumI = new Float64Array(N), smax = new Float64Array(N);
+  let maxS = 0, tS = 0, maxP = -Infinity, tP = 0, minPn = 0, maxAll = 0, maxPV = 0, Es = 0, Ei = 0, Epv = 0, Eq = 0, sPL = 0, sSL = 0, maxI = 0, overMin = 0;
+  for (let t = 0; t < N; t++) {
+    Pn[t] = P[t] - PV[t];
+    S[t] = hyp(Pn[t], Q[t], D[t]);
+    const i0 = S[t] / U0;
+    U[t] = clamp(231.6 + (Pn[t] >= 0 ? -.11 * i0 : .2 * i0) + 1.4 * (nz3(t) - .5), 220, 248);
+    I[t] = S[t] / U[t];
+    if (Pn[t] >= 0) {
+      Es += Pn[t] / 60;
+      if (S[t] > maxS) { maxS = S[t]; tS = t; }
+      if (S[t] > c.ps * 1000) { over[t] = 1; overMin++; }
+      maxI = Math.max(maxI, I[t]);
+    } else Ei += -Pn[t] / 60;
+    if (Pn[t] > maxP) { maxP = Pn[t]; tP = t; }
+    minPn = Math.min(minPn, Pn[t]); maxAll = Math.max(maxAll, S[t], Pn[t]); maxPV = Math.max(maxPV, PV[t]);
+    Epv += PV[t] / 60; Eq += Q[t] / 60; sPL += P[t]; sSL += hyp(P[t], Q[t], D[t]);
+    cumE[t] = Es; cumI[t] = Ei; smax[t] = maxS;
+  }
+  const events = [];
+  for (let t = 0; t < N; t++) if (over[t] && (t === 0 || !over[t - 1])) { let e = t; while (e < N && over[e]) e++; events.push([t, e]); }
+  R = {apps, P, Q, D, PV, Pn, S, U, I, over, cumE, cumI, smax, maxS, tS, maxP, tP, minPn, maxAll, maxPV, Es, Ei, Epv, Eq, lam: sPL / Math.max(sSL, 1), maxI, overMin, events};
+}
+
+/* ----- UI: presets & settings ----- */
+function buildPresets() {
+  $('#presets').innerHTML = Object.entries(PRESETS).map(([k, p]) =>
+    `<button type="button" class="preset" data-p="${k}"><b>${p.label}</b><span>${p.sub}</span></button>`).join('');
+  let html = '', grp = '';
+  for (const id of TOGGLES) {
+    const a = CAT[id];
+    if (a.g !== grp) { grp = a.g; html += `<li class="gh">${grp}</li>`; }
+    const meta = `${a.nom >= 1000 ? kv(a.nom) + ' kW' : a.nom + ' W'} · ${a.lam || 'λ ' + F2.format(lamOf(a.cos, a.d))}`;
+    html += `<li><label class="app"><input type="checkbox" class="sw" data-app="${id}"><span class="an">${a.name}<span class="am">${meta}</span></span><svg class="strip" viewBox="0 0 240 20" preserveAspectRatio="none" data-strip="${id}" aria-hidden="true"></svg></label></li>`;
+  }
+  $('#appList').innerHTML = html;
+}
+function syncUI() {
+  const c = state;
+  $$('.preset').forEach(b => b.setAttribute('aria-pressed', b.dataset.p === c.preset));
+  $('#customNote').hidden = c.preset !== 'custom';
+  $$('.seg[data-key]').forEach(s => { const v = String(c[s.dataset.key]); s.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); });
+  $('#psOut').textContent = c.ps + ' kVA';
+  $('#psHint').textContent = `Soit ${F0.format(c.ps * 1000 / U0)} A sous 230 V avant coupure.`;
+  $('#psDown').disabled = c.ps === TIERS[0]; $('#psUp').disabled = c.ps === TIERS[TIERS.length - 1];
+  const h = HEAT[c.heat];
+  $('#heatPowF').hidden = !h.range;
+  if (h.range) {
+    const r = $('#heatPow'); [r.min, r.max, r.step] = h.range; r.value = c.heatPow;
+    $('#heatPowL').textContent = h.label; $('#heatPowO').textContent = kv(c.heatPow) + ' kW';
+  }
+  $('#appointF').hidden = c.heat !== 'pac'; $('#appoint').checked = !!c.appoint;
+  $('#pv').value = c.pv; $('#pvO').textContent = c.pv ? F1.format(c.pv).replace(',0', '') + ' kWc' : 'Aucun';
+  $('#ev').checked = !!c.ev; $('#evOpts').disabled = !c.ev; $('#delest').checked = !!c.delest;
+  $$('[data-app]').forEach(i => i.checked = !!c.apps[i.dataset.app]);
+}
+function changed() { state.preset = 'custom'; refresh(); }
+function refresh(keepT = true) { syncUI(); simulate(); if (!keepT) state.t = R.tS; renderSim(); }
+
+$('#presets').addEventListener('click', e => { const b = e.target.closest('.preset'); if (!b) return; stopPlay(); applyPreset(b.dataset.p); refresh(false); });
+$('.cfg').addEventListener('click', e => {
+  const b = e.target.closest('.seg[data-key] button'); if (!b) return;
+  const key = b.parentElement.dataset.key; let v = b.dataset.v; if (NUMKEYS.has(key)) v = +v;
+  if (state[key] === v) return;
+  state[key] = v;
+  if (key === 'heat' && HEAT[v].range) { const [mn, mx] = HEAT[v].range; if (state.heatPow < mn || state.heatPow > mx) state.heatPow = HEAT[v].def; }
+  changed();
+});
+$('#psDown').addEventListener('click', () => { const i = TIERS.indexOf(state.ps); if (i > 0) { state.ps = TIERS[i - 1]; changed(); } });
+$('#psUp').addEventListener('click', () => { const i = TIERS.indexOf(state.ps); if (i < TIERS.length - 1) { state.ps = TIERS[i + 1]; changed(); } });
+$('#heatPow').addEventListener('input', e => { state.heatPow = +e.target.value; changed(); });
+$('#appoint').addEventListener('change', e => { state.appoint = e.target.checked; changed(); });
+$('#pv').addEventListener('input', e => { state.pv = +e.target.value; changed(); });
+$('#ev').addEventListener('change', e => { state.ev = e.target.checked; changed(); });
+$('#delest').addEventListener('change', e => { state.delest = e.target.checked; changed(); });
+$('#appList').addEventListener('change', e => { const i = e.target.closest('[data-app]'); if (!i) return; state.apps[i.dataset.app] = i.checked; changed(); });
+
+/* ----- render: summary ----- */
+function renderVerdict() {
+  const c = state, r = R, tS = tierFor(r.maxS), tP = tierFor(Math.max(r.maxP, 0));
+  const tierTxt = k => k ? `${k} kVA` : 'plus de 36 kVA';
+  let pill, title, body, acts = [];
+  if (r.events.length) {
+    const first = r.events[0];
+    pill = '<span class="pill bad">Coupure</span>';
+    title = `Le compteur coupe à ${hhmm(first[0])}`;
+    body = `La puissance apparente atteint <b>${f0(r.maxS)} VA</b> à ${hhmm(r.tS)} pour <b>${c.ps} kVA</b> souscrits. ${r.events.length} dépassement${r.events.length > 1 ? 's' : ''} dans la journée, ${dur(r.overMin)} au total.`;
+    if (tS) acts.push(`<button type="button" class="btn" data-act="ps:${tS}">Passer à ${tS} kVA</button>`);
+    if (c.ev && !c.delest) acts.push(`<button type="button" class="btn ghost" data-act="delest">Activer le délestage de la recharge</button>`);
+    if (c.ev && c.evMode === 'arrivee') acts.push(`<button type="button" class="btn ghost" data-act="evhc">Recharger à 22 h</button>`);
+  } else {
+    const pct = r.maxS / (c.ps * 1000) * 100;
+    pill = pct > 85 ? '<span class="pill warn">Juste</span>' : '<span class="pill ok">Aucune coupure</span>';
+    title = pct > 85 ? `Ça passe, de justesse : ${F0.format(pct)} % de l'abonnement au pic` : `Pic à ${f0(r.maxS)} VA, soit ${F0.format(pct)} % des ${c.ps} kVA`;
+    body = `Le pic de puissance apparente tombe à <b>${hhmm(r.tS)}</b>.`;
+    if (tS && tS < c.ps) { body += ` Pour cette journée, <b>${tS} kVA</b> suffiraient.`; acts.push(`<button type="button" class="btn ghost" data-act="ps:${tS}">Essayer ${tS} kVA</button>`); }
+    else body += ` L'abonnement est dimensionné au plus juste pour cette journée.`;
+  }
+  let watts = '';
+  const gap = r.maxS - Math.max(r.maxP, 0);
+  if (tP && tS && tP < tS) watts = `<p class="v-watts">En ne regardant que les watts (pic ${f0(r.maxP)} W), on aurait choisi ${tierTxt(tP)}. Les ${f0(gap)} VA d'écart font la différence.</p>`;
+  else if (gap > 150) watts = `<p class="v-watts">Au pic, le compteur voit ${f0(gap)} VA de plus que les watts consommés : du courant qui ne travaille pas mais compte dans l'abonnement.</p>`;
+  $('#verdict').innerHTML = `${pill}<p class="v-title">${title}</p><p class="v-body">${body}</p>${watts}${acts.length ? `<div class="v-act">${acts.join('')}</div>` : ''}`;
+}
+$('#verdict').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act;
+  if (a.startsWith('ps:')) state.ps = +a.slice(3);
+  else if (a === 'delest') state.delest = true;
+  else if (a === 'evhc') state.evMode = 'hc';
+  changed();
+});
+function renderKpis() {
+  const r = R, c = state, K = (k, n, u, sub, cls = '') => `<div class="kpi"><span class="k">${k}</span><span class="n ${cls}">${n}<small>${u}</small></span><span class="sub">${sub}</span></div>`;
+  let h = K('Pic apparent', f0(r.maxS), 'VA', `à ${hhmm(r.tS)} · limite ${c.ps * 1000 >= 1000 ? f0(c.ps * 1000) : ''} VA`, 'c-s');
+  h += K('Pic actif', f0(Math.max(r.maxP, 0)), 'W', `à ${hhmm(r.tP)}`, 'c-p');
+  h += K('Énergie facturée', F1.format(r.Es / 1000), 'kWh', 'active soutirée sur la journée', 'c-p');
+  h += K('Énergie réactive', F1.format(r.Eq / 1000), 'kvarh', 'mesurée, non facturée', 'c-q');
+  h += K('Facteur de puissance', F2.format(r.lam), '', 'moyen des appareils sur 24 h');
+  if (c.pv) { const auto = r.Epv ? (1 - r.Ei / r.Epv) * 100 : 0; h += K('Production solaire', F1.format(r.Epv / 1000), 'kWh', `${F0.format(auto)} % autoconsommés · ${F1.format(r.Ei / 1000)} kWh injectés`, 'c-pv'); }
+  else h += K('Courant maximal', F0.format(r.maxI), 'A', `sur ${F0.format(c.ps * 1000 / U0)} A disponibles`);
+  $('#kpis').innerHTML = h;
+}
+function stripPath(arr, max) {
+  if (!max) return '';
+  let d = 'M0 20'; const step = 4;
+  for (let t = 0; t < N; t += step) { let m = 0; for (let k = t; k < t + step; k++) m = Math.max(m, arr[k]); d += `L${(t / N * 240).toFixed(1)} ${(20 - m / max * 18).toFixed(1)}`; }
+  return d + 'L240 20Z';
+}
+function setStrip(svg, arrs, on, cls = 'on') {
+  const sum = new Float64Array(N); arrs.forEach(a => { for (let t = 0; t < N; t++) sum[t] += a[t]; });
+  let mx = 0; for (let t = 0; t < N; t++) mx = Math.max(mx, sum[t]);
+  svg.innerHTML = mx ? `<path class="st-a ${on ? cls : ''}" d="${stripPath(sum, mx)}"/>` : '';
+}
+function renderStrips() {
+  const a = R.apps;
+  setStrip($('#stHeat'), HEAT[state.heat].ids.map(i => a[i].P), true);
+  setStrip($('#stEcs'), [a.ecs.P], a.ecs.on);
+  setStrip($('#stPv'), [R.PV], true, 'pv');
+  setStrip($('#stEv'), [a.ve.P], a.ve.on);
+  $$('[data-strip]').forEach(s => setStrip(s, [a[s.dataset.strip].P], a[s.dataset.strip].on));
+  const ev = a.ve;
+  $('#evInfo').textContent = !state.ev ? '' : ev.got < EV_E - 50
+    ? `Recharge incomplète : ${F1.format(ev.got / 1000)} kWh sur 14 en 24 h.`
+    : `14 kWh de ${hhmm(ev.start)} à ${hhmm(ev.end)}${ev.slowed ? `, dont ${dur(ev.slowed)} ralenties` : ''}.`;
+}
+
+/* ----- chart ----- */
+let CG = null;
+function niceUp(v) { const e = Math.pow(10, Math.floor(Math.log10(v))); for (const s of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (s * e >= v) return s * e; return 10 * e; }
+function tickStep(r) { const raw = r / 5, e = Math.pow(10, Math.floor(Math.log10(raw))); for (const s of [1, 2, 2.5, 5, 10]) if (s * e >= raw) return s * e; return 10 * e; }
+function renderChart() {
+  const svg = $('#chart'), r = R, c = state;
+  const W = Math.max(300, svg.clientWidth || 800), H = W < 560 ? 250 : 310;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.style.height = H + 'px';
+  const L = 40, Rr = 10, T = 30, B = 24;
+  const yMax = niceUp(Math.max(c.ps * 1000 * 1.12, r.maxAll * 1.06, r.maxPV * 1.06, 1000));
+  const yMin = r.minPn < 0 ? -niceUp(-r.minPn * 1.12) : 0;
+  const x = t => L + (W - L - Rr) * t / (N - 1), y = v => T + (H - T - B) * (yMax - v) / (yMax - yMin);
+  CG = {W, H, L, Rr, T, B, x, y};
+  let g = '';
+  g += `<rect class="hc-band" x="${x(0)}" y="${T}" width="${x(hm(6)) - x(0)}" height="${H - T - B}"/><rect class="hc-band" x="${x(hm(22))}" y="${T}" width="${x(N - 1) - x(hm(22))}" height="${H - T - B}"/>`;
+  g += `<text x="${x(hm(3))}" y="${H - B - 6}" text-anchor="middle">heures creuses</text>`;
+  const st = tickStep(yMax - yMin);
+  for (let v = Math.ceil(yMin / st) * st; v <= yMax + 1; v += st) {
+    g += `<line class="${Math.abs(v) < 1 ? 'gl0' : 'gl'}" x1="${L}" x2="${W - Rr}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 3.5}" text-anchor="end">${kv(v)}</text>`;
+  }
+  g += `<text x="${L}" y="${T - 16}" text-anchor="start">kVA · kW</text>`;
+  for (const [a, b] of r.events) g += `<rect class="ov-band" x="${x(a)}" y="${T}" width="${Math.max(2, x(b) - x(a))}" height="${H - T - B}"/><rect class="ov-tick" x="${x(a)}" y="${T - 6}" width="${Math.max(2, x(b) - x(a))}" height="4"/>`;
+  let ap = `M${x(0)} ${y(0)}`, an = `M${x(0)} ${y(0)}`, ls = '', lp = '', lpv = '';
+  for (let t = 0; t < N; t++) {
+    const X = x(t).toFixed(1), c2 = t ? 'L' : 'M';
+    ap += `L${X} ${y(Math.max(r.Pn[t], 0)).toFixed(1)}`;
+    an += `L${X} ${y(Math.min(r.Pn[t], 0)).toFixed(1)}`;
+    ls += c2 + X + ' ' + y(r.S[t]).toFixed(1);
+    lp += c2 + X + ' ' + y(r.Pn[t]).toFixed(1);
+    if (c.pv) lpv += c2 + X + ' ' + y(r.PV[t]).toFixed(1);
+  }
+  ap += `L${x(N - 1)} ${y(0)}Z`; an += `L${x(N - 1)} ${y(0)}Z`;
+  g += `<path class="ar-load" d="${ap}"/>`;
+  if (r.minPn < 0) g += `<path class="ar-inj" d="${an}"/>`;
+  g += `<path class="l-p" d="${lp}"/>`;
+  if (c.pv) g += `<path class="l-pv" d="${lpv}"/>`;
+  g += `<path class="l-s" d="${ls}"/>`;
+  const yps = y(c.ps * 1000);
+  g += `<line class="l-ps" x1="${L}" x2="${W - Rr}" y1="${yps}" y2="${yps}"/><text class="t-al" x="${W - Rr - 4}" y="${yps - 5}" text-anchor="end">PCOUP ${c.ps} kVA</text>`;
+  const every = W < 560 ? 6 : 3;
+  for (let h = 0; h <= 24; h += every) g += `<text x="${x(Math.min(h * 60, N - 1))}" y="${H - 6}" text-anchor="${h === 0 ? 'start' : h === 24 ? 'end' : 'middle'}">${h} h</text>`;
+  g += `<g id="cur"></g>`;
+  svg.innerHTML = g;
+  $('#lgPv').hidden = !c.pv; $('#lgInj').hidden = !(r.minPn < 0);
+  $('#nextOver').disabled = !r.events.length;
+}
+function renderCursor() {
+  if (!CG) return;
+  const {x, y, T, H, B, W} = CG, t = state.t, r = R;
+  const X = x(t);
+  $('#cur').innerHTML = `<line class="cur-l" x1="${X}" x2="${X}" y1="${T - 8}" y2="${H - B}"/><circle class="dot-p cur-d" cx="${X}" cy="${y(r.Pn[t])}" r="4"/><circle class="dot-s cur-d" cx="${X}" cy="${y(r.S[t])}" r="4.5"/>`;
+  const tip = $('#tip'), svg = $('#chart'), scale = svg.clientWidth / W;
+  tip.innerHTML = `<b>${hhmm(t)}</b><span class="ts">${f0(r.S[t])} VA</span><span class="tp">${f0(r.Pn[t])} W</span>${r.over[t] ? '<span class="ta">coupure</span>' : ''}`;
+  const tw = tip.offsetWidth || 160, px = clamp(X * scale, tw / 2, svg.clientWidth - tw / 2);
+  tip.style.left = px + 'px'; tip.style.top = '-6px';
+  $('#tRange').value = t; $('#tOut').textContent = hhmm(t);
+}
+
+/* ----- instant panel ----- */
+const LCD = [
+  {k: 'SINSTS', d: 'Puissance apparente instantanée soutirée', v: (r, t) => [String(Math.round(r.Pn[t] >= 0 ? r.S[t] : 0)).padStart(5, '0'), 'VA']},
+  {k: 'SINSTI', d: 'Puissance apparente instantanée injectée', pv: true, v: (r, t) => [String(Math.round(r.Pn[t] < 0 ? r.S[t] : 0)).padStart(5, '0'), 'VA']},
+  {k: 'IRMS1', d: 'Courant efficace sur la phase 1', v: (r, t) => [String(Math.round(r.I[t])).padStart(3, '0'), 'A']},
+  {k: 'URMS1', d: 'Tension efficace sur la phase 1', v: (r, t) => [String(Math.round(r.U[t])).padStart(3, '0'), 'V']},
+  {k: 'EAST', d: 'Index d\'énergie active soutirée, base de facturation', v: (r, t) => [String(Math.round(21458230 + r.cumE[t])).padStart(9, '0'), 'Wh']},
+  {k: 'EAIT', d: 'Index d\'énergie active injectée', pv: true, v: (r, t) => [String(Math.round(1904512 + r.cumI[t])).padStart(9, '0'), 'Wh']},
+  {k: 'SMAXSN', d: 'Puissance apparente maximale soutirée depuis minuit', v: (r, t) => [String(Math.round(r.smax[t])).padStart(5, '0'), 'VA']},
+  {k: 'PREF', d: 'Puissance apparente de référence, celle de l\'abonnement', v: () => [String(state.ps).padStart(2, '0'), 'kVA']},
+  {k: 'PCOUP', d: 'Puissance apparente au-delà de laquelle le compteur coupe', v: () => [String(state.ps).padStart(2, '0'), 'kVA']},
+  {k: 'LTARF', d: 'Libellé de la période tarifaire en cours', v: (r, t) => [inR(t, hm(22), hm(6)) ? 'H CREUSES' : 'H PLEINES', '']}
+];
+let lcdIdx = 0, lcdAuto = !RM, lcdTimer = null;
+const lcdItems = () => LCD.filter(i => !i.pv || state.pv);
+function renderLcd() {
+  const items = lcdItems(); lcdIdx = ((lcdIdx % items.length) + items.length) % items.length;
+  const it = items[lcdIdx], [v, u] = it.v(R, state.t), txt = u ? `${v} ${u}` : v;
+  $('#lcdK').textContent = it.k; $('#lcdN').textContent = `${lcdIdx + 1}/${items.length}`;
+  $('#lcdV').textContent = txt; $('#lcdG').textContent = txt.replace(/[^\s]/g, '8');
+  $('#lcdD').textContent = it.d;
+  $('#lcd').classList.toggle('alarm', !!R.over[state.t]);
+}
+function startLcd() { clearInterval(lcdTimer); if (lcdAuto) lcdTimer = setInterval(() => { lcdIdx++; renderLcd(); }, 2800); }
+$('#lcdNext').addEventListener('click', () => { lcdAuto = false; clearInterval(lcdTimer); lcdIdx++; renderLcd(); });
+$('#lcdPrev').addEventListener('click', () => { lcdAuto = false; clearInterval(lcdTimer); lcdIdx--; renderLcd(); });
+
+function renderInstant() {
+  const r = R, t = state.t, c = state;
+  const pn = r.Pn[t], s = r.S[t];
+  $('#instTitle').textContent = `À ${hhmm(t)}`;
+  $('#iSl').textContent = pn >= 0 ? 'Apparente soutirée' : 'Apparente injectée';
+  $('#iPl').textContent = pn >= 0 ? 'Active soutirée' : 'Active injectée';
+  $('#iS').textContent = f0(s); $('#iP').textContent = f0(Math.abs(pn));
+  $('#iL').textContent = s > 1 ? F2.format(Math.abs(pn) / s) : '—';
+  $('#iQ').textContent = f0(r.Q[t]); $('#iD').textContent = f0(r.D[t]); $('#iI').textContent = F1.format(r.I[t]);
+  drawTriangle($('#simTri'), pn, r.Q[t], r.D[t]);
+  const ms = $('#mState');
+  ms.className = 'm-state' + (r.over[t] ? ' bad' : pn < 0 ? ' inj' : '');
+  ms.textContent = r.over[t] ? 'DÉPASSEMENT · COUPURE' : pn < 0 ? 'INJECTION' : 'CONTACT FERMÉ';
+  renderLcd();
+
+  // breakdown
+  const rows = [];
+  for (const [id, a] of Object.entries(r.apps)) {
+    if (!a.on || a.P[t] < .5) continue;
+    const name = id === 've' ? 'Voiture électrique' : CAT[id].name;
+    rows.push({name, P: a.P[t], S: hyp(a.P[t], a.Q[t], a.D[t])});
+  }
+  rows.sort((a, b) => b.S - a.S);
+  const pv = r.PV[t];
+  const mx = Math.max(1, pv, ...rows.map(x => x.S));
+  let h = rows.map(x => `<div class="bk-row"><span class="bk-n">${x.name}</span><span class="bk-v">${f0(x.P)} W · ${f0(x.S)} VA · λ ${F2.format(x.P / x.S)}</span><div class="bk-bars"><div class="bk-s" style="width:${(x.S / mx * 100).toFixed(1)}%"></div><div class="bk-p" style="width:${(x.P / mx * 100).toFixed(1)}%"></div></div></div>`).join('');
+  if (pv > 1) h += `<div class="bk-row"><span class="bk-n c-pv">Production photovoltaïque</span><span class="bk-v c-pv">−${f0(pv)} W · λ 1,00</span><div class="bk-bars"><div class="bk-g" style="width:${(pv / mx * 100).toFixed(1)}%"></div></div></div>`;
+  $('#bkList').innerHTML = h;
+  $('#bkTitle').textContent = `Qui consomme à ${hhmm(t)} ?`;
+  const sumS = rows.reduce((a, x) => a + x.S, 0), sumP = rows.reduce((a, x) => a + x.P, 0);
+  $('#bkSum').innerHTML = `<span>Somme des appareils</span><span class="mono">${f0(sumP)} W · <span class="c-s">${f0(sumS)} VA</span></span><span>Vu par le compteur</span><span class="mono">${f0(pn)} W · <span class="c-s">${f0(s)} VA</span></span>`;
+  let note;
+  if (pv > 1 && s > 1) note = `Le soleil compense des watts, pas les var ni les harmoniques : ${f0(Math.abs(pn))} W au compteur mais encore ${f0(s)} VA, soit un facteur de puissance de ${F2.format(Math.abs(pn) / s)}.`;
+  else if (sumS - s > 5) note = `Les VA des appareils totalisent ${f0(sumS)}, le compteur n'en voit que ${f0(s)}. Déphasages et harmoniques se combinent comme des vecteurs, pas comme des nombres.`;
+  else note = 'Charges presque toutes résistives à cet instant : watts et voltampères se confondent.';
+  $('#bkNote').textContent = note;
+}
+
+/* ----- time control ----- */
+function setT(t) { state.t = clamp(Math.round(t), 0, N - 1); renderCursor(); renderInstant(); }
+let playing = false, last = 0, acc = 0;
+function stopPlay() { playing = false; $('#playTxt').textContent = 'Lire'; $('#playIco').innerHTML = '<path d="M2 1l9 5-9 5z"/>'; }
+$('#play').addEventListener('click', () => {
+  if (playing) return stopPlay();
+  playing = true; last = performance.now(); acc = state.t;
+  $('#playTxt').textContent = 'Pause'; $('#playIco').innerHTML = '<path d="M2 1h3v10H2zM7 1h3v10H7z"/>';
+  requestAnimationFrame(function step(now) {
+    if (!playing) return;
+    acc += (now - last) / 1000 * 40; last = now;
+    if (acc >= N) acc -= N;
+    if ((acc | 0) !== state.t) setT(acc | 0);
+    requestAnimationFrame(step);
+  });
+});
+$('#tRange').addEventListener('input', e => { stopPlay(); setT(+e.target.value); });
+$('#toPeak').addEventListener('click', () => { stopPlay(); setT(R.tS); });
+$('#nextOver').addEventListener('click', () => { stopPlay(); const ev = R.events.find(e => e[0] > state.t) || R.events[0]; if (ev) setT(ev[0]); });
+const chart = $('#chart');
+function scrubFrom(e) { const b = chart.getBoundingClientRect(), g = CG; const xv = (e.clientX - b.left) * (g.W / b.width); setT((xv - g.L) / (g.W - g.L - g.Rr) * (N - 1)); }
+chart.addEventListener('pointerdown', e => { stopPlay(); chart.setPointerCapture(e.pointerId); scrubFrom(e); });
+chart.addEventListener('pointermove', e => { if (chart.hasPointerCapture(e.pointerId) || (e.pointerType === 'mouse' && !playing)) scrubFrom(e); });
+
+function renderSim() { renderVerdict(); renderKpis(); renderStrips(); renderChart(); renderCursor(); renderInstant(); }
+
+/* ----- boot ----- */
+buildPresets();
+applyPreset('pacve');
+refresh(false);
+renderLab();
+startLcd();
+let rT = null;
+const ro = new ResizeObserver(() => { clearTimeout(rT); rT = setTimeout(() => { renderChart(); renderCursor(); drawTriangle($('#simTri'), R.Pn[state.t], R.Q[state.t], R.D[state.t]); buildScope(); const lr = labCalc(); drawTriangle($('#labTri'), lr.P, lr.Q, lr.D); }, 80); });
+ro.observe($('#chartWrap')); ro.observe($('#scope').parentElement);
+})();
+</script>
+
+</body></html>
