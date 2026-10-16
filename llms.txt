@@ -1,0 +1,17 @@
+# Watts & voltampères
+
+> Simulateur interactif : comprenez la différence entre watts (W), voltampères (VA) et var, le facteur de puissance et pourquoi votre compteur Linky coupe en kVA alors que vous payez des kWh.
+
+Page unique en français, gratuite, sous licence CC BY 4.0 (citer Lunik et le lien). Public : lycée, BTS, formation, grand public.
+
+## Pages
+- [Démonstrateur](https://lunik.github.io/Watts-voltamp-res/): oscilloscope, quatre grandeurs (P, Q, D, S), simulateur de foyer, mémo Linky, FAQ
+- [Code source](https://github.com/Lunik/Watts-voltamp-res): dépôt GitHub
+
+## Idées clés
+- **Quelle est la différence entre un watt (W) et un voltampère (VA) ?** Le watt mesure la puissance active, celle qui produit un travail réel (chaleur, mouvement, lumière). Le voltampère mesure la puissance apparente, le produit de la tension par le courant. Les deux sont égaux pour une charge purement résistive. Dès qu'il y a un déphasage ou des harmoniques, les VA dépassent les W.
+- **Qu'est-ce que le facteur de puissance ?** Le facteur de puissance λ est le rapport entre la puissance active P (W) et la puissance apparente S (VA) : λ = P / S. Il vaut 1 quand tout le courant travaille, et baisse avec la puissance réactive (moteurs) et les harmoniques (électronique).
+- **Qu'est-ce que la puissance réactive (var) ?** La puissance réactive, en var, est l'énergie qui fait des allers-retours entre la source et la charge (moteurs, transformateurs) sans produire de travail. Elle augmente le courant dans les câbles sans augmenter la consommation en kWh.
+- **Pourquoi mon abonnement est-il en kVA et ma facture en kWh ?** La facture compte l'énergie active, en kilowattheures. L'abonnement plafonne la puissance apparente, en kilovoltampères, car c'est elle qui détermine le courant que le réseau et votre installation doivent supporter.
+- **Quand le compteur Linky coupe-t-il ?** Le Linky ouvre son organe de coupure quand la puissance apparente dépasse la puissance de coupure (PCOUP) liée à votre abonnement, après une tolérance et une temporisation. Cette page simplifie ce comportement.
+- **Pourquoi le facteur de puissance chute-t-il avec des panneaux solaires ?** Avec du solaire, la puissance active soutirée au réseau diminue en journée, mais la puissance réactive reste la même. Le rapport P / S vu par le compteur baisse donc.
